@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,9 +51,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         ButterKnife.bind(this);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        initSpinner();
         seekBarInitialization();
+        Toast.makeText(this, "Scroll down to see terms of use", Toast.LENGTH_LONG).show();
     }
 
     private void seekBarInitialization() {
