@@ -28,13 +28,22 @@
         <activity
             android:name=".SettingsActivity"
             android:label="Settings"
+<<<<<<< HEAD
             android:parentActivityName=".MainActivity" />
+=======
+            android:parentActivityName="gis2018.udacity.tametu.MainActivity"
+            android:screenOrientation="portrait" />
+>>>>>>> 8b0b11b13c9d718502a7229da431da0c5fb64ddc
         <!-- Broadcast receiver for notification action button -->
         <receiver android:name=".StopTimerActionReceiver" />
         <receiver android:name=".StartTimerActionReceiver" />
 
         <activity
+<<<<<<< HEAD
             android:name=".Aboutus"
+=======
+            android:name="gis2018.udacity.tametu.Aboutus"
+>>>>>>> 8b0b11b13c9d718502a7229da431da0c5fb64ddc
             android:label="ABOUT US"
             android:parentActivityName=".SettingsActivity"></activity>
 
