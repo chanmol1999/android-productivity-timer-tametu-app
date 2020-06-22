@@ -9,8 +9,9 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import gis2018.udacity.tametu.utils.Utils;
 
@@ -22,6 +23,7 @@ import static gis2018.udacity.tametu.utils.Constants.INTENT_VALUE_COMPLETE;
 import static gis2018.udacity.tametu.utils.Constants.STOP_ACTION_BROADCAST;
 import static gis2018.udacity.tametu.utils.Constants.TAMETU;
 import static gis2018.udacity.tametu.utils.Constants.TASK_INFORMATION_NOTIFICATION_ID;
+import static gis2018.udacity.tametu.utils.Constants.TASK_MESSAGE;
 import static gis2018.udacity.tametu.utils.Utils.ringID;
 import static gis2018.udacity.tametu.utils.Utils.soundPool;
 import static gis2018.udacity.tametu.utils.Utils.tickID;
@@ -112,7 +114,7 @@ public class CountDownTimerService extends Service {
                         .addAction(R.drawable.complete, "Complete", completeActionPendingIntent)
                         .addAction(R.drawable.cancel, "Cancel", cancelActionPendingIntent)
                         .setContentTitle("Tametu Countdown Timer")
-                        .setContentText("Countdown timer is running");
+                        .setContentText(getContentText());
                 break;
             case 1:
             case 2:
@@ -134,6 +136,18 @@ public class CountDownTimerService extends Service {
         startForeground(ID, notification);
         countDownTimerBuilder(TIME_PERIOD, TIME_INTERVAL).start();
         return START_REDELIVER_INTENT;
+    }
+
+    private String getContentText() {
+        String contentText;
+        String taskMessage = preferences.getString(TASK_MESSAGE, null);
+        assert taskMessage != null;
+        if (!taskMessage.equals("")) {
+            contentText = taskMessage + " is running";
+        } else {
+            contentText = "Countdown timer is running";
+        }
+        return contentText;
     }
 
     /**

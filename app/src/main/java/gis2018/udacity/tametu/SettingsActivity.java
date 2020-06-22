@@ -1,11 +1,9 @@
 package gis2018.udacity.tametu;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
+import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,6 +11,9 @@ import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NavUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,7 +28,6 @@ import static gis2018.udacity.tametu.utils.VolumeSeekBarUtils.maxVolume;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, SeekBar.OnSeekBarChangeListener {
 
-    private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
     @BindView(R.id.work_duration_spinner)
     Spinner workDurationSpinner;
     @BindView(R.id.short_break_duration_spinner)
@@ -40,6 +40,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     SeekBar tickingSeekBar;
     @BindView(R.id.ringing_seek_bar)
     SeekBar ringingSeekBar;
+    @BindView(R.id.about_us_text)
+    TextView aboutUsTextView;
     private SharedPreferences preferences;
 
     @Override
@@ -52,16 +54,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         initSpinner();
-        TextView aboutus = (TextView) findViewById(R.id.Aboutus);
-        aboutus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(SettingsActivity.this, Aboutus.class);
-                startActivity(i);
-            }
-        });
 
         seekBarInitialization();
+        aboutUsTextView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void seekBarInitialization() {

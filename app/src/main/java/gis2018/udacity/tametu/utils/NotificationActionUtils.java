@@ -3,7 +3,8 @@ package gis2018.udacity.tametu.utils;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+
+import androidx.core.app.NotificationCompat;
 
 import gis2018.udacity.tametu.R;
 import gis2018.udacity.tametu.StartTimerActionReceiver;
@@ -29,7 +30,7 @@ public class NotificationActionUtils {
                 return new NotificationCompat.Action(
                         R.drawable.play,
                         context.getString(R.string.start_tametu),
-                        getPendingIntent(SHORT_BREAK, INTENT_VALUE_START, context));
+                        getPendingIntent(TAMETU, INTENT_VALUE_START, context));
             case SHORT_BREAK:
                 return new NotificationCompat.Action(
                         R.drawable.short_break,

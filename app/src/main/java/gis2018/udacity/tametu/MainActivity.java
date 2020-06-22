@@ -16,10 +16,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -28,6 +24,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.Date;
 
@@ -48,6 +49,7 @@ import static gis2018.udacity.tametu.utils.Constants.START_LONG_BREAK_AFTER_KEY;
 import static gis2018.udacity.tametu.utils.Constants.STOP_ACTION_BROADCAST;
 import static gis2018.udacity.tametu.utils.Constants.TAMETU;
 import static gis2018.udacity.tametu.utils.Constants.TASK_INFORMATION_NOTIFICATION_ID;
+import static gis2018.udacity.tametu.utils.Constants.TASK_MESSAGE;
 import static gis2018.udacity.tametu.utils.Constants.TASK_ON_HAND_COUNT_KEY;
 import static gis2018.udacity.tametu.utils.Constants.WORK_DURATION_KEY;
 import static gis2018.udacity.tametu.utils.NotificationActionUtils.getIntervalAction;
@@ -82,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AlertDialog alertDialog;
     private boolean isAppVisible = true;
     private String currentCountDown; // Current duration for Work-Session, Short-Break or Long-Break
+    @BindView(R.id.current_task_name_textview_main)
+    EditText message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         setOnClickListeners();
 
-        // Set button as checked if the service is already running.
-        timerButton.setChecked(isServiceRunning(CountDownTimerService.class));
+        determineViewState(isServiceRunning(CountDownTimerService.class));
 
         // Receives broadcast that the timer has stopped.
         stoppedBroadcastReceiver = new BroadcastReceiver() {
@@ -137,8 +140,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         alertDialog = createTametuCompletionAlertDialog();
         displayTametuCompletionAlertDialog();
 
-        final EditText message = (EditText) findViewById(R.id.current_task_name_textview_main);
-
         final SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
 
@@ -172,10 +173,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void determineViewState(boolean serviceRunning) {
+        // Set button as checked if the service is already running.
+        timerButton.setChecked(serviceRunning);
+        //Set task message editable-ity.
+        message.setFocusableInTouchMode(!serviceRunning);
+        message.setClickable(!serviceRunning);
+        message.setFocusable(!serviceRunning);
+    }
+
     private void sessionStartAVFeedback() {
         ToggleButton toggleButton = findViewById(R.id.timer_button_main);
         toggleButton.setChecked(true);
-
+        //Disable editing.
+        message.setClickable(false);
+        message.setFocusable(false);
         try {
             if (alertDialog.isShowing())
                 alertDialog.dismiss();
@@ -207,6 +219,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sessionCompleteAVFeedback(Context context) {
+        //Enable editing the task message
+        message.setClickable(true);
+        message.setFocusable(true);
+        message.setFocusableInTouchMode(true);
         // Retrieving value of currentlyRunningServiceType from SharedPreferences.
         currentlyRunningServiceType = Utils.retrieveCurrentlyRunningServiceType(preferences,
                 getApplicationContext());
@@ -329,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         sessionCancel(this, preferences);
                     }
                 }
+                preferences.edit().putString(TASK_MESSAGE, message.getText().toString()).apply(); //Stores the task message to shared prefs. This will be used to display in the notification.
                 break;
 
             case R.id.finish_imageview_main:
@@ -513,20 +530,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (currentlyRunningServiceType) {
             case TAMETU:
                 notificationBuilder
-                        .addAction(getIntervalAction(currentlyRunningServiceType, MainActivity.this))
+                        .addAction(getIntervalAction(TAMETU, MainActivity.this))
                         .setContentTitle(getString(R.string.break_over_notification_title))
                         .setContentText(getString(R.string.break_over_notification_content_text));
                 break;
             case SHORT_BREAK:
                 notificationBuilder
-                        .addAction(getIntervalAction(currentlyRunningServiceType, MainActivity.this))
+                        .addAction(getIntervalAction(SHORT_BREAK, MainActivity.this))
                         .addAction(getIntervalAction(LONG_BREAK, MainActivity.this))
                         .setContentTitle(getString(R.string.tametu_completion_notification_message))
                         .setContentText(getString(R.string.session_over_notification_content_text));
                 break;
             case LONG_BREAK:
                 notificationBuilder
-                        .addAction(getIntervalAction(currentlyRunningServiceType, MainActivity.this))
+                        .addAction(getIntervalAction(LONG_BREAK, MainActivity.this))
                         .addAction(getIntervalAction(SHORT_BREAK, MainActivity.this))
                         .setContentTitle(getString(R.string.tametu_completion_alert_message))
                         .setContentText(getString(R.string.session_over_notification_content_text));
